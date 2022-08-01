@@ -3,6 +3,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 const initialState = {
   bookings: [],
   chosedSeats: [],
+  loading: false,
   isBusy: false,
   
 };
@@ -55,7 +56,11 @@ export const bookingSlice = createSlice({
       })
       .addCase(createBooking.fulfilled, (state, action) => {
         state.bookings.push(action.payload);
-      });
+        state.loading = false
+      })
+      .addCase(createBooking.pending, (state, action) => {
+        state.loading = true
+      })
   },
 });
 

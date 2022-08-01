@@ -1,11 +1,11 @@
-import React, { useEffect } from "react"
-import styles from "./Book.module.css"
-import { useDispatch, useSelector } from "react-redux"
+import React, { useEffect } from "react";
+import styles from "./Book.module.css";
+import { useDispatch, useSelector } from "react-redux";
 import {
   getSessionById,
   getSessions,
 } from "../../features/Sessions/sessionSlice";
-import { NavLink, useParams } from "react-router-dom";
+import { NavLink, useNavigate, useParams } from "react-router-dom";
 
 import { useState } from "react";
 import { MdOutlineChair } from "react-icons/md";
@@ -14,29 +14,34 @@ import {
   choseSeat,
   createBooking,
   getBooking,
-} from "../../features/Booking/bookingSlice"
-import { getMovies } from "../../features/Movies/moviesSlice"
+} from "../../features/Booking/bookingSlice";
+import { getMovies } from "../../features/Movies/moviesSlice";
 
 const Book = () => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const session = useSelector((state) => state.sessionReducer.session);
   const bookings = useSelector((state) => state.bookingReducer.bookings);
   const chosedSeats = useSelector((state) => state.bookingReducer.chosedSeats);
   const movies = useSelector((state) => state.movieReducer.movies);
+  const loading = useSelector((state) => state.bookingReducer.loading);
 
   const user = localStorage.getItem("user");
-  const token = localStorage.getItem("token")
+  const token = localStorage.getItem("token");
 
   const { id } = useParams();
   const [sum, setSum] = useState(0);
 
-  const rows = new Array(session?.hall?.row).fill(null)
-  const cols = new Array(session?.hall?.column).fill(null)
+  const rows = new Array(session?.hall?.row).fill(null);
+  const cols = new Array(session?.hall?.column).fill(null);
 
   const handleBuy = (arr) => {
     dispatch(createBooking(arr));
-    setSum(sum + session.hall.seatPrice);
+
+    setTimeout(() => {
+      navigate("/personal");
+    }, 1000);
   };
 
   const handleChange = (row, col, session1, userId) => {
@@ -54,11 +59,11 @@ const Book = () => {
   };
 
   useEffect(() => {
-    dispatch(getSessionById(id))
-    dispatch(getBooking())
-    dispatch(getMovies())
-    dispatch(getSessions())
-  }, [dispatch])
+    dispatch(getSessionById(id));
+    dispatch(getBooking());
+    dispatch(getMovies());
+    dispatch(getSessions());
+  }, [dispatch]);
 
   if (session) {
     return (
@@ -68,7 +73,7 @@ const Book = () => {
             <h1>
               {movies.map((movie) => {
                 if (session.movie === movie._id) {
-                  return movie.name
+                  return movie.name;
                 }
               })}
             </h1>
@@ -92,14 +97,14 @@ const Book = () => {
               </h5>
             </div>
             <div className={styles.transition}>
-              <NavLink to="/personal" className={styles.button_text}>
-                <button
-                  disabled={(chosedSeats.length > 0 && token)? false : true}
-                  onClick={() => handleBuy(chosedSeats)}
-                >
-                  Оплатить {session && sum} ₽
-                </button>
-              </NavLink>
+              {/* <NavLink to="/personal" className={styles.button_text}> */}
+              <button
+                disabled={chosedSeats.length > 0 && token ? false : true}
+                onClick={() => handleBuy(chosedSeats)}
+              >
+                Оплатить {session && sum} ₽
+              </button>
+              {/* </NavLink> */}
             </div>
           </div>
         </div>
@@ -115,15 +120,15 @@ const Book = () => {
                       book.row === i + 1 &&
                       book.session === id
                     )
-                      return true
+                      return true;
 
-                    return false
-                  })
+                    return false;
+                  });
                   const chosed = chosedSeats.find((seat) => {
-                    if (seat.col === j + 1 && seat.row === i + 1) return true
+                    if (seat.col === j + 1 && seat.row === i + 1) return true;
 
-                    return false
-                  })
+                    return false;
+                  });
                   return (
                     <td
                       className={`${styles.seats_numbers} ${
@@ -140,11 +145,11 @@ const Book = () => {
                       />
                       <p> {j + 1}</p>
                     </td>
-                  )
+                  );
                 })}
                 <td className={styles.right_rowName}>{i + 1}</td>
               </tr>
-            )
+            );
           })}
         </table>
 
@@ -152,8 +157,8 @@ const Book = () => {
           <h3>Экран</h3>
         </div>
       </div>
-    )
+    );
   }
-}
+};
 
-export default Book
+export default Book;
